@@ -113,6 +113,15 @@ int load_file(const char *name) {
     return EXIT_ERROR;
   }
 
+  printf("Managed to load the JPG file!\n");
+
+  int width;
+  int height;
+
+  jpeg_get_size(data, &width, &height);
+
+  printf("size: %i x %i px\n", width, height);
+
   return EXIT_SUCCESS;
 }
 
