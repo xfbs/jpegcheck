@@ -4,9 +4,19 @@ If you want to use a boot splash image (see [this wiki](https://www.coreboot.org
 
 ## Usage
 
+Clone the repository and initialise and update the submodules
+
     $ git clone https://github.com/xfbs/jpegcheck
+    $ cd jpegcheck
     $ git submodule init
+    $ git submodule update
+
+Compile the code with make.
+
     $ make
+
+Run it by passing the path of a JPEG file to the tool.
+
     $ ./jpegcheck <imagefile>
 
 ## License
