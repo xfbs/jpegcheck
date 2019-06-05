@@ -102,7 +102,7 @@ int load_file(const char *name) {
 
   printf("size: %i x %i px\n", width, height);
 
-  int depth = 8;
+  int depth = 24;
   unsigned char *pic = malloc(width * height * depth / 8);
 
   if(!pic) {
