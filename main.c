@@ -89,7 +89,7 @@ int load_file(const char *name) {
   int ret = jpeg_decode(data, (unsigned char *) content);
 
   if(ret != 0) {
-    jpeg_error_show(ret);
+    eprintf("error in jpeg_decode: %s.\n", jpeg_error_to_str(ret));
     return EXIT_ERROR;
   }
 
@@ -101,6 +101,26 @@ int load_file(const char *name) {
   jpeg_get_size(data, &width, &height);
 
   printf("size: %i x %i px\n", width, height);
+
+  int depth = 8;
+  unsigned char *pic = malloc(width * height * depth / 8);
+
+  if(!pic) {
+    eprintf("can't alloc space for pic.\n");
+    return EXIT_ALLOC;
+  }
+
+  ret = jpeg_show(data, pic, width, height, depth, 0);
+
+  if(ret != 0) {
+    eprintf("error in jpeg_show: %s.\n", jpeg_error_to_str(ret));
+    return EXIT_ERROR;
+  }
+
+  printf("managed to extract pixel data from image.\n");
+
+  free(pic);
+  free(data);
 
   return EXIT_SUCCESS;
 }
