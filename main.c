@@ -7,69 +7,45 @@
 #define EXIT_FREAD 3
 #define EXIT_ERROR 4
 
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
+
 int show_help(const char *name) {
   fprintf(stderr, "%s <filename>\n", name);
 
   return EXIT_HELP;
 }
 
-void show_error(int ret) {
+const char *jpeg_error_to_str(int ret) {
   switch(ret) {
-    case 1:
-      fprintf(stderr, "ERR_NO_SOI\n");
-      break;
-    case 2:
-      fprintf(stderr, "ERR_NOT_8BIT\n");
-      break;
-    case 3:
-      fprintf(stderr, "ERR_HEIGHT_MISMATCH\n");
-      break;
-    case 4:
-      fprintf(stderr, "ERR_WIDTH_MISMATCH\n");
-      break;
-    case 5:
-      fprintf(stderr, "ERR_BAD_WIDTH_OR_HEIGHT\n");
-      break;
-    case 6:
-      fprintf(stderr, "ERR_TOO_MANY_COMPPS\n");
-      break;
-    case 7:
-      fprintf(stderr, "ERR_ILLEGAL_HV\n");
-      break;
-    case 8:
-      fprintf(stderr, "ERR_QUANT_TABLE_SELECTOR\n");
-      break;
-    case 9:
-      fprintf(stderr, "ERR_NOT_YCBCR_221111\n");
-      break;
-    case 10:
-      fprintf(stderr, "ERR_UNKNOWN_CID_IN_SCAN\n");
-      break;
-    case 11:
-      fprintf(stderr, "ERR_NOT_SEQUENTIAL_DCT\n");
-      break;
-    case 12:
-      fprintf(stderr, "ERR_WRONG_MARKER\n");
-      break;
-    case 13:
-      fprintf(stderr, "ERR_NO_EOI\n");
-      break;
-    case 14:
-      fprintf(stderr, "ERR_BAD_TABLES\n");
-      break;
-    case 15:
-      fprintf(stderr, "ERR_DEPTH_MISMATCH\n");
-      break;
-    default:
-      fprintf(stderr, "unknown error occured in jpeg_decode().\n");
+    case  0: return "ERR_SUCCESS";
+    case  1: return "ERR_NO_SOI";
+    case  2: return "ERR_NOT_8BIT";
+    case  3: return "ERR_HEIGHT_MISMATCH";
+    case  4: return "ERR_WIDTH_MISMATCH";
+    case  5: return "ERR_BAD_WIDTH_OR_HEIGHT";
+    case  6: return "ERR_TOO_MANY_COMPPS";
+    case  7: return "ERR_ILLEGAL_HV";
+    case  8: return "ERR_QUANT_TABLE_SELECTOR";
+    case  9: return "ERR_NOT_YCBCR_221111";
+    case 10: return "ERR_UNKNOWN_CID_IN_SCAN";
+    case 11: return "ERR_NOT_SEQUENTIAL_DCT";
+    case 12: return "ERR_WRONG_MARKER";
+    case 13: return "ERR_NO_EOI";
+    case 14: return "ERR_BAD_TABLES";
+    case 15: return "ERR_DEPTH_MISMATCH";
+    default: return "ERR_UNKNOWN";
   }
+}
+
+void jpeg_error_show(int ret) {
+  eprintf("Error in jpeg_decode: %s.\n", jpeg_error_to_str(ret));
 }
 
 const char *read_file(const char *name) {
   FILE *file = fopen(name, "rb");
 
   if(file == NULL) {
-    fprintf(stderr, "error while opening file %s.\n", name);
+    eprintf("error while opening file %s.\n", name);
     return NULL;
   }
 
@@ -81,7 +57,11 @@ const char *read_file(const char *name) {
   // read file into buffer
   char *buffer = malloc(length + 1);
   if(buffer) {
-    fread(buffer, 1, length, file);
+    if(length != fread(buffer, 1, length, file)) {
+      eprintf("error while reading file %s.\n", name);
+      free(buffer);
+      return NULL;
+    }
     buffer[length] = '\0';
   }
 
@@ -95,21 +75,21 @@ int load_file(const char *name) {
   struct jpeg_decdata *data = jpeg_alloc();
 
   if(data == NULL) {
-    fprintf(stderr, "can't alloc jpeg_decdata\n");
+    eprintf("can't alloc jpeg_decdata\n");
     return EXIT_ALLOC;
   }
 
   const char *content = read_file(name);
 
   if(content == NULL) {
-    fprintf(stderr, "can't read file %s.\n", name);
+    eprintf("can't read file %s.\n", name);
     return EXIT_FREAD;
   }
 
   int ret = jpeg_decode(data, (unsigned char *) content);
 
   if(ret != 0) {
-    show_error(ret);
+    jpeg_error_show(ret);
     return EXIT_ERROR;
   }
 
