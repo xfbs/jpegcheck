@@ -1,4 +1,4 @@
-jpegcheck: jpeg.o main.o
+jpegcheck: jpeg.o main.o qdbmp/qdbmp.o
 	$(CC) -o jpegcheck $^
 
 clean:

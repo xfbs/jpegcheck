@@ -1,4 +1,5 @@
 #include "util.h"
+#include "qdbmp/qdbmp.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -70,6 +71,28 @@ const char *read_file(const char *name) {
   return buffer;
 }
 
+void write_file(int width, int height, int depth, const unsigned char *pic) {
+  BMP *bmp = BMP_Create((UINT) width, (UINT) height, (USHORT) depth);
+
+  if(!bmp) {
+    eprintf("error creating BMP.\n");
+  }
+
+  size_t bytes_per_line = width * depth / 8;
+  size_t bytes_per_pixel = depth / 8;
+
+  for(int x = 0; x < width; x++) {
+    for(int y = 0; y < height; y++) {
+      const unsigned char *pos = pic + (y * bytes_per_line) + (x * bytes_per_pixel);
+      BMP_SetPixelRGB(bmp, x, y, pos[0], pos[1], pos[2]);
+    }
+  }
+
+  BMP_WriteFile(bmp, "out.bmp");
+
+  BMP_Free(bmp);
+}
+
 int load_file(const char *name) {
   // allocate jpeg decode data struct
   struct jpeg_decdata *data = jpeg_alloc();
@@ -118,6 +141,8 @@ int load_file(const char *name) {
   }
 
   printf("managed to extract pixel data from image.\n");
+
+  write_file(width, height, depth, pic);
 
   free(pic);
   free(data);
