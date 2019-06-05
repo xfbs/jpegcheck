@@ -4,10 +4,14 @@ If you want to use a boot splash image (see [this wiki](https://www.coreboot.org
 
 ## Usage
 
-Clone the repository and initialise and update the submodules
+### Convert JPEG file to be compatible with SeaBIOS
 
-    $ git clone https://github.com/xfbs/jpegcheck
-    $ cd jpegcheck
+    ./convert.sh inputfile.png
+
+### Build jpegcheck manually
+
+Make sure to initialise and update the submodules.
+
     $ git submodule init
     $ git submodule update
 
@@ -18,6 +22,8 @@ Compile the code with make.
 Run it by passing the path of a JPEG file to the tool.
 
     $ ./jpegcheck <imagefile>
+
+If it succeeds, the tool will create (meaning, overwrite) a out.bmp file containing the JPG image as parsed by the SeaBIOS jpeg parser. You can use this to verify that everything looks okay.
 
 ## License
 
