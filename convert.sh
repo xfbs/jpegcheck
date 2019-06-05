@@ -1,10 +1,11 @@
 #!/bin/bash
+set -e
 
 git submodule init -q
 git submodule update -q
 
-bash -c "make -s" &
-bash -c "cd ijg && test -f Makefile || ./configure -q && make > /dev/null" &
+bash -c "make -j 4 -s" &
+bash -c "cd ijg && test -f Makefile || ./configure -q && make -j 4 > /dev/null" &
 
 convert "$1" "$1.ppm"
 
