@@ -1,6 +1,6 @@
 [submodule "seabios"]
 	path = seabios
-	url = https://git.seabios.org/seabios.git
+    url = https://github.com/xfbs/seabios
 [submodule "ijg"]
 	path = ijg
 	url = https://github.com/libjpeg-turbo/ijg
